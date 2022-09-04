@@ -19,26 +19,26 @@ if (path.endsWith(".js")) {
 } else if (path.endsWith(".json")) {
   const file = JSON.parse(await Deno.readTextFile(path));
 
-  for (i of file.projects) {
+  for (const i of file.projects) {
     console.log("Compiling '%s' -> '%s'", i.path, i.out);
 
-    if (!i.path.endsWith(".js")) {
-      console.error("error: File does not end in JS! Skipping...");
-      continue;
-    }
-
-    const data = compile(i.path);
+    const data = typeof i.type == "string" && i.type == "static" ? await Deno.readTextFile(i.path) : compile(i.path);
     
     const dirPath = i.out.split("/");
     dirPath.pop();
 
     try {
-      await Deno.mkdir(dirPath, { recursive: true });
+      await Deno.mkdir(dirPath.join("/"), { recursive: true });
     } catch (e) {
       console.warn("WARN <Step::Mkdir>:", e);
     }
 
-    await Deno.writeTextFile(i.out, data);
+    try {
+      await Deno.writeTextFile(i.out, data);
+    } catch (e) {
+      console.error("ERR <Step::Write>:", e);
+    }
+    
   }
 } else {
   console.error("error: Invalid file type!");
