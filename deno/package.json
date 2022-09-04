@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start-deno": "cd deno && npm start",
-    "compile-deno": "cd deno && npm run compile"
+    "start": "deno run --allow-read --allow-write index.js",
+    "compile": "deno compile --allow-read --allow-write index.js"
   },
   "keywords": [],
   "author": "",
