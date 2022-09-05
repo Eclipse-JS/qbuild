@@ -6,12 +6,10 @@ function stringParser(str) {
 }
 
 function compile(path, disableWelcome) {
-  const delimiter = os.platform() == "win32" ? "\\" : "/";
-
-  const rootPathArr = path.split(delimiter);
+  const rootPathArr = path.split("/");
   rootPathArr.pop();
 
-  const rootPath = rootPathArr.join(delimiter);
+  const rootPath = rootPathArr.join("/");
 
   const file = fs.readFileSync(path, "utf-8");
 
@@ -24,9 +22,12 @@ function compile(path, disableWelcome) {
     const trim = file.trim();
     const newDelimiter = isRegularRequireEnabled ? "require(" : "qb.require(";
 
-    if (trim.startsWith("qb.enableRegularRequire()")) {
-      isRegularRequireEnabled = true;
+    if (trim.startsWith("qb")) {
       newLines.push("// QBuild Omitted: " + file);
+
+      if (trim.startsWith("qb.enableRegularRequire()")) {
+        isRegularRequireEnabled = true;
+      }
     } else if (trim.includes(newDelimiter)) {
       const rawCommand = newDelimiter + trim.split(newDelimiter)[1].split(")")[0] + ")";
       

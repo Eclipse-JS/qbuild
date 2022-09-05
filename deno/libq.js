@@ -1,16 +1,12 @@
-import os from "https://deno.land/x/dos@v0.11.0/mod.ts";
-
 function stringParser(str) {
   return str.split(str[0])[1];
 }
 
 export function compile(path, disableWelcome) {
-  const delimiter = os.platform == "windows" ? "\\" : "/";
-
-  const rootPathArr = path.split(delimiter);
+  const rootPathArr = path.split("/");
   rootPathArr.pop();
 
-  const rootPath = rootPathArr.join(delimiter);
+  const rootPath = rootPathArr.join("/");
 
   const file = Deno.readTextFileSync(path);
 
@@ -23,9 +19,12 @@ export function compile(path, disableWelcome) {
     const trim = file.trim();
     const newDelimiter = isRegularRequireEnabled ? "require(" : "qb.require(";
 
-    if (trim.startsWith("qb.enableRegularRequire()")) {
-      isRegularRequireEnabled = true;
+    if (trim.startsWith("qb")) {
       newLines.push("// QBuild Omitted: " + file);
+
+      if (trim.startsWith("qb.enableRegularRequire()")) {
+        isRegularRequireEnabled = true;
+      }
     } else if (trim.includes(newDelimiter)) {
       const rawCommand = newDelimiter + trim.split(newDelimiter)[1].split(")")[0] + ")";
       
